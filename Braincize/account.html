@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Account</title>
+    <link rel="stylesheet" href="account.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+</head>
+<body class="body">
+
+<script>
+  async function load() {
+    const model = await tf.loadLayersModel('model.json');
+    return model;
+  };
+
+  function predict(model) {
+    // first we get the value in the input field
+    const userInput = document.getElementById('userInput').value
+    const inputTensor = tf.tensor([parseInt(userInput)]);  // then convert to tensor
+
+    // now lets make the prediction, we use .then because the model is a promise
+    // (this is confusing as a Python user, but useful so check it out if interested)
+    model.then(model => {
+      let result = model.predict(inputTensor);
+      result = result.round().dataSync()[0];  // round prediction and get value
+      alert(result ? "odd" : "even");
+    });
+  };
+  
+  const model = load();  // load model immediately to avoid delay when user clicks 'Predict'
+</script>
+
+    <div class="header">
+        <img src="images/Back icon.png" alt="" class="imgback">
+        <ul>
+            <li> <a href="#profile" class="menu"> <h2>Profile</h2></a></li>
+            <li><img src="images/profile.png" alt=""></li>
+        </ul>
+    </div>
+    <div class="container">
+        <div class="upload">
+            <form action="/form/submit" method="post">
+                <h4> select only image </h4>
+                <div class="uploadfile">
+                     <input id="userInput" type="file" name="Image" class="hide_file" accept="image/*">
+                </div>
+                <br>
+                <h4>Analyse for brain shrinkage</h4> <br>
+                <button onclick="predict(model)">Predict</button>
+            </form>
+        </div>
+    </div>
+</body>
